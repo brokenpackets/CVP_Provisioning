@@ -9,6 +9,16 @@ username = 'cvpadmin'
 password = 'Arista'
 server1 = 'https://192.168.255.50'
 
+"""
+Requirements:
+  - Load this file onto CVP itself, and update the username, password, and server1 IP to
+  reference your CVP server information.
+  - Configure TerminAttr to stream to CVP, and also configure the 'cvsourceip' daemon attribute
+  for the loopback you want to manage through, eg:
+      {options ... -cvsourceip=192.0.2.1} as an example if Loopback0 is 192.0.2.1/32.
+  - Run script from CVP bash shell using 'python provision.py'
+"""
+
 connect_timeout = 10
 headers = {"Accept": "application/json",
            "Content-Type": "application/json"}
