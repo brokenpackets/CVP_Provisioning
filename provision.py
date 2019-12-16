@@ -17,6 +17,7 @@ Requirements:
   for the loopback you want to manage through, eg:
       {options ... -cvsourceip=192.0.2.1} as an example if Loopback0 is 192.0.2.1/32.
   - Run script from CVP bash shell using 'python provision.py'
+  - Note for switches in ZTP mode change the ZtpMode flag to true from false when applying the metadata
 """
 
 connect_timeout = 10
@@ -50,21 +51,24 @@ def parse_inventory(url_prefix):
     inventory = get_inventory(server1)
     for device in inventory:
         if not device['status'] and not device['parentContainerKey']:
+          try:
             mgmtIP = get_mgmt_ip(device['serialNumber'])
             devices.update({device['hostname']: {'serial': device['serialNumber'],
                 'ipAddr': mgmtIP, 'macAddr': device['systemMacAddress']}})
+          except:
+            print device['hostname'], "wasn't added as it does not have the cvsourceip set"
     return devices
 
 def apply_metadata(ipAddr,macAddr):
     currentTime = datetime.datetime.now()
     nanotimestamp = str(currentTime.isoformat('T'))+'000Z'
-    os.system("""/cvpi/tools/apish publish -d cvp -t %s -p '[{"key":"inventory"}, {"key":"deviceMetadata"}]' --update '{"value": {"IpAddress": "%s", "ZtpMode": false}, "key": "%s"}'""" % (nanotimestamp, ipAddr, macAddr))
+    os.system("""/cvpi/tools/apish publish -d cvp -t %s -p 'inventory/deviceMetadata' --update '{"value": {"IpAddress": "%s", "ZtpMode": true}, "key": "%s"}'""" % (nanotimestamp, ipAddr, macAddr))
     return 'metadata applied to '+ipAddr
 
 def apply_provisioning(serialNumber):
     currentTime = datetime.datetime.now()
     nanotimestamp = str(currentTime.isoformat('T'))+'000Z'
-    os.system("""/cvpi/tools/apish publish -d cvp -t %s -p '[{"key":"inventory"}, {"key":"requests"}]' --update '{"value": {"userName": "cvp system", "containerKey": "undefined_container"}, "key": {"requestType": "mapToContainer", "serialNumber": "%s"}}'""" % (nanotimestamp, serialNumber))
+    os.system("""/cvpi/tools/apish publish -d cvp -t %s -p 'inventory/requests' --update '{"value": {"userName": "cvp system", "containerKey": "undefined_container"}, "key": {"requestType": "mapToContainer", "serialNumber": "%s"}}'""" % (nanotimestamp, serialNumber))
     return 'provisioning applied to '+serialNumber
 
 def get_mgmt_ip(serialNumber):
