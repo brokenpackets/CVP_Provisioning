@@ -62,13 +62,13 @@ def parse_inventory(url_prefix):
 def apply_metadata(ipAddr,macAddr):
     currentTime = datetime.datetime.now()
     nanotimestamp = str(currentTime.isoformat('T'))+'000Z'
-    os.system("""/cvpi/tools/apish publish -d cvp -t %s -p '[{"key":"inventory"}, {"key":"deviceMetadata"}]' --update '{"value": {"IpAddress": "%s", "ZtpMode": false}, "key": "%s"}'""" % (nanotimestamp, ipAddr, macAddr))
+    os.system("""/cvpi/tools/apish publish -d cvp -t %s -p '["inventory", "deviceMetadata"]' --update '{"value": {"IpAddress": "%s", "ZtpMode": false}, "key": "%s"}'""" % (nanotimestamp, ipAddr, macAddr))
     return 'metadata applied to '+ipAddr
 
 def apply_provisioning(serialNumber):
     currentTime = datetime.datetime.now()
     nanotimestamp = str(currentTime.isoformat('T'))+'000Z'
-    os.system("""/cvpi/tools/apish publish -d cvp -t %s -p '[{"key":"inventory"}, {"key":"requests"}]' --update '{"value": {"userName": "cvp system", "containerKey": "undefined_container"}, "key": {"requestType": "mapToContainer", "serialNumber": "%s"}}'""" % (nanotimestamp, serialNumber))
+    os.system("""/cvpi/tools/apish publish -d cvp -t %s -p '["inventory", "requests"]' --update '{"value": {"userName": "cvp system", "containerKey": "undefined_container"}, "key": {"requestType": "mapToContainer", "serialNumber": "%s"}}'""" % (nanotimestamp, serialNumber))
     return 'provisioning applied to '+serialNumber
 
 def get_mgmt_ip(serialNumber):
