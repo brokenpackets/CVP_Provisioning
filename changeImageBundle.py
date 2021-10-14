@@ -62,6 +62,10 @@ def remap_Bundle(url_prefix,hostname,nodeMAC,BundleId,imageToLoad):
     response = session.post(url_prefix+'/cvpservice/ztp/addTempAction.do?format=topology&queryParam=&nodeId=root',data=json.dumps(tempData))
     return response.json()
 
+def save_Topology(url_prefix):
+    response = session.post(url_prefix+'/cvpservice/provisioning/saveTopology.do')
+    return response
+
 #### Login ####
 for server in server_list:
     server1 = 'https://'+server
@@ -74,6 +78,6 @@ for server in server_list:
          if device['hostname'] in devices_to_upgrade:
              print 'Device '+device['hostname']+' in list to upgrade. Mapping Bundle.'
              output = remap_Bundle(server1,device['hostname'],device['systemMacAddress'],imageBundleID,imageToLoad)
-    # refresh and saveTopology after running
+    save_Topology(server1)
     logout(server1)
 print 'Done'
